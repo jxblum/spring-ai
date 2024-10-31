@@ -27,10 +27,12 @@ import io.micrometer.tracing.handler.TracingObservationHandler.TracingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
  * @author Christian Tzolov
+ * @author John Blum
  * @since 1.0.0
  */
 @SuppressWarnings({ "rawtypes", "null" })
@@ -62,12 +64,13 @@ public class ErrorLoggingObservationHandler implements ObservationHandler {
 	}
 
 	@Override
-	public boolean supportsContext(Context context) {
-		return (context == null) ? false : this.supportedContextTypes.stream().anyMatch(clz -> clz.isInstance(context));
+	public boolean supportsContext(@Nullable Context context) {
+		return context != null && this.supportedContextTypes.stream().anyMatch(clz -> clz.isInstance(context));
 	}
 
 	@Override
-	public void onError(Context context) {
+	@SuppressWarnings("unused")
+	public void onError(@Nullable Context context) {
 		if (context != null) {
 			TracingContext tracingContext = context.get(TracingContext.class);
 			if (tracingContext != null) {
